@@ -1,0 +1,115 @@
+{
+  "model_version": "v1.0.0-20261010-hgb",
+  "algorithm": "HistGradientBoostingClassifier + CalibratedClassifierCV(sigmoid)",
+  "feature_names": [
+    "url_length",
+    "hostname_length",
+    "path_length",
+    "query_length",
+    "longest_label_length",
+    "digit_count_host",
+    "letter_count_host",
+    "special_count_host",
+    "digit_ratio_host",
+    "digit_count_path",
+    "special_count_url",
+    "hostname_entropy",
+    "path_entropy",
+    "is_ip",
+    "ip_is_hex_or_octal",
+    "num_subdomains",
+    "subdomain_depth",
+    "tld_risk_group",
+    "tld_is_common",
+    "hyphen_count_host",
+    "is_punycode",
+    "is_mixed_script",
+    "has_nonstandard_port",
+    "has_userinfo_at",
+    "longest_label_length_host",
+    "path_depth",
+    "num_query_params",
+    "longest_param_value_length",
+    "has_base64_blob",
+    "has_hex_blob",
+    "has_suspicious_extension",
+    "has_embedded_redirect",
+    "double_slash_in_path",
+    "encoded_char_ratio_url",
+    "double_encoding",
+    "suspicious_token_count_host",
+    "suspicious_token_count_path",
+    "suspicious_token_count_query",
+    "brand_lookalike_score",
+    "brand_in_subdomain_not_registrable",
+    "brand_in_path_not_registrable",
+    "is_shortener",
+    "is_tunnel_host"
+  ],
+  "num_features": 43,
+  "suspicious_threshold": 0.2,
+  "malicious_threshold": 0.7,
+  "validation_metrics": {
+    "brier_score": 0.0033526742745302947,
+    "roc_auc": 0.9999973823497076,
+    "pr_auc": 0.9999991377556122
+  },
+  "calibration_reliability_curve": [
+    {
+      "bin": 1,
+      "mean_predicted_prob": 0.026792338087424553,
+      "fraction_positives": 0.0
+    },
+    {
+      "bin": 2,
+      "mean_predicted_prob": 0.11871957456848005,
+      "fraction_positives": 0.08333333333333333
+    },
+    {
+      "bin": 3,
+      "mean_predicted_prob": 0.24117366273331858,
+      "fraction_positives": 0.0
+    },
+    {
+      "bin": 4,
+      "mean_predicted_prob": 0.43895096015239127,
+      "fraction_positives": 1.0
+    },
+    {
+      "bin": 5,
+      "mean_predicted_prob": 0.5468341031968321,
+      "fraction_positives": 1.0
+    },
+    {
+      "bin": 6,
+      "mean_predicted_prob": 0.6611565914981863,
+      "fraction_positives": 1.0
+    },
+    {
+      "bin": 7,
+      "mean_predicted_prob": 0.7585035045581076,
+      "fraction_positives": 1.0
+    },
+    {
+      "bin": 8,
+      "mean_predicted_prob": 0.8473767927605999,
+      "fraction_positives": 1.0
+    },
+    {
+      "bin": 9,
+      "mean_predicted_prob": 0.9488404781888408,
+      "fraction_positives": 1.0
+    }
+  ],
+  "dataset_counts": {
+    "train_samples": 3527,
+    "val_samples": 2024,
+    "train_domains": 2515,
+    "val_domains": 538
+  },
+  "training_date": "2026-10-10T05:49:43.250582+00:00",
+  "library_versions": {
+    "scikit_learn": "3.0.6",
+    "joblib": "1.6.0"
+  }
+}

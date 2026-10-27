@@ -1,0 +1,573 @@
+/* ==========================================================================
+   PhishShield — Cyber Guardian Component Styles
+   Reference 1: Login & Registration Split-Screen Composition
+   Reference 2: Interior Blue Cybersecurity Aesthetic
+   ========================================================================== */
+
+/* Layout Components */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  background: transparent;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  background: linear-gradient(180deg, rgba(5, 18, 46, 0.98) 0%, rgba(3, 11, 28, 0.98) 100%);
+  border-right: 1px solid rgba(22, 200, 255, 0.2);
+  box-shadow: 4px 0 24px rgba(3, 11, 28, 0.5);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease-in-out;
+  z-index: 40;
+}
+
+.sidebar-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(22, 200, 255, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-title {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.01em;
+}
+
+.sidebar-nav {
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-sm);
+  color: #A3C5EC;
+  font-weight: 500;
+  font-size: 0.92rem;
+  transition: all 0.15s ease;
+  border-left: 3px solid transparent;
+}
+
+.nav-item:hover {
+  background: rgba(22, 200, 255, 0.12);
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+.nav-item.active {
+  background: linear-gradient(90deg, rgba(8, 127, 245, 0.35) 0%, rgba(22, 200, 255, 0.12) 100%);
+  color: #16C8FF;
+  font-weight: 600;
+  border-left-color: #16C8FF;
+  box-shadow: inset 0 0 12px rgba(22, 200, 255, 0.12);
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: transparent;
+}
+
+.topbar {
+  height: var(--topbar-height);
+  background: rgba(5, 18, 46, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(22, 200, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  box-shadow: 0 4px 20px rgba(3, 11, 28, 0.4);
+}
+
+.topbar h2 {
+  color: #FFFFFF;
+  font-size: 1.05rem;
+}
+
+.system-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #BFDCFC;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 10px #10B981;
+}
+
+.status-dot.degraded {
+  background: #F59E0B;
+  box-shadow: 0 0 10px #F59E0B;
+}
+
+.page-wrapper {
+  padding: 2.25rem 2rem;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 1.75rem;
+}
+
+.page-title {
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.015em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.page-subtitle {
+  color: #BFDCFC;
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+
+/* Interior Cards (Reference 2 Luminous Deep Navy Style) */
+.card {
+  background: rgba(6, 22, 54, 0.85);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(22, 200, 255, 0.24);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1.5rem;
+  color: #FFFFFF;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  border-color: rgba(22, 200, 255, 0.5);
+  box-shadow: 0 14px 40px rgba(3, 12, 32, 0.55), 0 0 18px rgba(8, 127, 245, 0.2);
+}
+
+.card h2, .card h3, .card h4, .card h5 {
+  color: #FFFFFF;
+}
+
+.card p {
+  color: #D0E3FA;
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.88rem;
+  margin-bottom: 0.5rem;
+  color: #EAF5FF;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(22, 200, 255, 0.3);
+  border-radius: var(--radius-sm);
+  background: rgba(4, 15, 38, 0.85);
+  color: #FFFFFF;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #16C8FF;
+  box-shadow: 0 0 0 3px rgba(22, 200, 255, 0.25);
+}
+
+.form-input::placeholder {
+  color: #6E91BC;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #087FF5 0%, #0056C6 100%);
+  color: #FFFFFF;
+  border: 1px solid #16C8FF;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 14px rgba(8, 127, 245, 0.4);
+  cursor: pointer;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #16C8FF 0%, #087FF5 100%);
+  border-color: #FFFFFF;
+  box-shadow: 0 4px 22px rgba(22, 200, 255, 0.55);
+  text-decoration: none;
+}
+
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  background: rgba(12, 36, 82, 0.75);
+  color: #EAF5FF;
+  border: 1px solid rgba(22, 200, 255, 0.35);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: rgba(18, 54, 120, 0.95);
+  border-color: #16C8FF;
+  color: #FFFFFF;
+  box-shadow: 0 0 12px rgba(22, 200, 255, 0.25);
+  text-decoration: none;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+
+.badge-malicious {
+  background: var(--verdict-malicious-bg);
+  color: var(--verdict-malicious-text);
+  border-color: var(--verdict-malicious-border);
+}
+
+.badge-suspicious {
+  background: var(--verdict-suspicious-bg);
+  color: var(--verdict-suspicious-text);
+  border-color: var(--verdict-suspicious-border);
+}
+
+.badge-clean {
+  background: var(--verdict-clean-bg);
+  color: var(--verdict-clean-text);
+  border-color: var(--verdict-clean-border);
+}
+
+.badge-inconclusive {
+  background: var(--verdict-inconclusive-bg);
+  color: var(--verdict-inconclusive-text);
+  border-color: var(--verdict-inconclusive-border);
+}
+
+/* Result Cards */
+.result-header-card {
+  border-left: 6px solid;
+  border-radius: var(--radius-md);
+  background: rgba(6, 22, 54, 0.9);
+}
+
+.result-header-card.malicious {
+  border-left-color: #EF4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.result-header-card.suspicious {
+  border-left-color: #F59E0B;
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.result-header-card.clean {
+  border-left-color: #10B981;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.result-header-card.inconclusive {
+  border-left-color: #64748B;
+  background: rgba(100, 116, 139, 0.12);
+}
+
+/* Collapsible sections */
+.collapsible-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0.75rem 0;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #FFFFFF;
+  text-align: left;
+}
+
+/* File Upload Dropzone */
+.dropzone {
+  border: 2px dashed rgba(22, 200, 255, 0.35);
+  border-radius: var(--radius-md);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  background: rgba(4, 16, 42, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #CFE3FA;
+}
+
+.dropzone:hover, .dropzone.drag-active {
+  border-color: #16C8FF;
+  background: rgba(8, 32, 80, 0.85);
+  box-shadow: 0 0 20px rgba(22, 200, 255, 0.25);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .app-container {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(22, 200, 255, 0.2);
+  }
+  .page-wrapper {
+    padding: 1.25rem 1rem;
+  }
+}
+
+/* ==========================================================================
+   Reference 1 — Login & Registration Split-Screen Composition
+   ========================================================================== */
+
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #D8EBF9; /* Reference 1 Pale blue outer canvas background */
+  padding: 2rem 1.5rem;
+  position: relative;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 980px;
+  min-height: 570px;
+  background: #081026;
+  border: 1px solid rgba(22, 200, 255, 0.2);
+  border-radius: 24px; /* Reference 1 rounded main container */
+  box-shadow: 0 28px 65px rgba(8, 22, 54, 0.28), 0 0 45px rgba(8, 127, 245, 0.12);
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  padding: 0;
+}
+
+/* Left Form Area (Reference 1) */
+.auth-form-panel {
+  flex: 1;
+  max-width: 480px;
+  min-width: 340px;
+  padding: 3.25rem 2.75rem;
+  background: radial-gradient(circle at 85% 25%, rgba(0, 220, 255, 0.2) 0%, rgba(6, 14, 34, 0.98) 55%), #060E22;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-header {
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.auth-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+  font-size: 0.92rem;
+  color: #8EA4C4;
+  line-height: 1.45;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.auth-form label {
+  color: #A2BBD8;
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 0.45rem;
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 0.9rem;
+  color: #5B7B9E;
+  pointer-events: none;
+}
+
+/* Reference 1 White Form Inputs with Rounded Corners */
+.input-with-icon input {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.6rem;
+  border: 1px solid #C4DAED;
+  border-radius: 12px; /* Reference 1 rounded white input */
+  background: #FFFFFF !important;
+  color: #061A35 !important;
+  font-size: 0.95rem;
+  transition: all 0.15s ease;
+}
+
+.input-with-icon input::placeholder {
+  color: #94A3B8;
+}
+
+.input-with-icon input:focus {
+  outline: none;
+  border-color: #1462FF;
+  box-shadow: 0 0 0 3px rgba(20, 98, 255, 0.25);
+}
+
+/* Reference 1 Bright Blue Rounded Primary Button */
+.auth-submit-btn {
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  justify-content: center;
+  margin-top: 0.5rem;
+  background: #1462FF !important; /* Reference 1 bright electric blue */
+  border: none;
+  border-radius: 14px; /* Reference 1 rounded button */
+  color: #FFFFFF;
+  box-shadow: 0 4px 18px rgba(20, 98, 255, 0.45);
+  transition: all 0.15s ease;
+}
+
+.auth-submit-btn:hover:not(:disabled) {
+  background: #0A52E8 !important;
+  box-shadow: 0 6px 24px rgba(20, 98, 255, 0.6);
+  transform: translateY(-1px);
+}
+
+.auth-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: rgba(220, 38, 38, 0.2);
+  border: 1px solid #EF4444;
+  color: #FCA5A5;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  margin-bottom: 1.25rem;
+}
+
+.auth-link {
+  color: #16C8FF;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.auth-link:hover {
+  color: #38BDF8;
+}
+
+/* Right Artwork Area (Reference 1 Cyber Shield Artwork) */
+.auth-visual-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 50%, rgba(8, 127, 245, 0.28) 0%, rgba(5, 12, 28, 0) 70%), #050C1E;
+  border-left: 1px solid rgba(22, 200, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+}
+
+.auth-visual-glow {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.35) 0%, rgba(8, 127, 245, 0.1) 60%, transparent 100%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.auth-shield-svg {
+  width: 100%;
+  max-width: 440px;
+  height: auto;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 0 25px rgba(22, 200, 255, 0.35));
+}
+
+@media (max-width: 768px) {
+  .auth-card {
+    flex-direction: column;
+    max-width: 480px;
+  }
+  .auth-visual-panel {
+    display: none;
+  }
+  .auth-form-panel {
+    max-width: 100%;
+    padding: 2.5rem 1.75rem;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -1,0 +1,47 @@
+# PhishShield Backend Dependencies
+# Python 3.10+ required
+
+# Web framework
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+python-multipart==0.0.12
+
+# Configuration
+pydantic==2.9.2
+pydantic-settings==2.5.2
+
+# Database
+sqlalchemy==2.0.36
+alembic==1.13.3
+
+# HTTP client
+httpx==0.27.2
+
+# ML
+scikit-learn==1.5.2
+numpy==2.1.3
+pandas==2.2.3
+joblib==1.4.2
+
+# Gradient boosting (one of these; try lightgbm first, fall back to xgboost)
+lightgbm==4.5.0
+
+# URL analysis
+tldextract==5.1.2
+idna==3.10
+
+# APK analysis
+androguard==3.3.5
+
+# OCR (optional – pytesseract needs tesseract binary)
+pytesseract==0.3.13
+Pillow==11.0.0
+
+# PDF export
+reportlab==4.2.5
+
+# Rate limiting
+slowapi==0.1.9
+
+# Security auditing
+pip-audit==2.7.3

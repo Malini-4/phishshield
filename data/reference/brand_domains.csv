@@ -1,0 +1,49 @@
+brand,category,official_registrable_domains,country,source_note
+SBI,bank,"sbi.co.in,onlinesbi.sbi,onlinesbi.com,sbiyono.sbi",IN,Verified from sbi.co.in official site
+HDFC Bank,bank,"hdfcbank.com,netbanking.hdfcbank.com",IN,Verified from hdfcbank.com
+ICICI Bank,bank,"icicibank.com,icinetsec.com",IN,Verified from icicibank.com
+Axis Bank,bank,"axisbank.com",IN,Verified from axisbank.com
+Kotak Bank,bank,"kotak.com,kotakbank.com",IN,Verified from kotak.com
+PNB,bank,"pnbindia.in,netpnb.com",IN,Verified from pnbindia.in
+Bank of Baroda,bank,"bankofbaroda.in,bobibanking.com",IN,Verified from bankofbaroda.in
+Canara Bank,bank,"canarabank.com,canarabank.in",IN,Verified from canarabank.com
+Union Bank,bank,"unionbankofindia.co.in,unionbankonline.co.in",IN,Verified from unionbankofindia.co.in
+IDFC First Bank,bank,"idfcfirstbank.com",IN,Verified from idfcfirstbank.com
+IndusInd Bank,bank,"indusind.com",IN,Verified from indusind.com
+Yes Bank,bank,"yesbank.in",IN,Verified from yesbank.in
+Google Pay,payment,"pay.google.com,google.com",IN/Global,Verified from pay.google.com
+PhonePe,payment,"phonepe.com",IN,Verified from phonepe.com
+Paytm,payment,"paytm.com",IN,Verified from paytm.com
+BHIM,payment,"bhimupi.npci.org.in,npci.org.in",IN,Verified from npci.org.in
+NPCI,payment,"npci.org.in",IN,Verified from npci.org.in
+RBI,government,"rbi.org.in",IN,Verified from rbi.org.in
+Income Tax,government,"incometax.gov.in,efiling.incometax.gov.in",IN,Verified from incometax.gov.in
+UIDAI/Aadhaar,government,"uidai.gov.in,myaadhaar.uidai.gov.in",IN,Verified from uidai.gov.in
+EPFO,government,"epfindia.gov.in,unifiedportal-mem.epfindia.gov.in",IN,Verified from epfindia.gov.in
+DigiLocker,government,"digilocker.gov.in",IN,Verified from digilocker.gov.in
+IRCTC,government,"irctc.co.in,irctcconnect.com",IN,Verified from irctc.co.in
+TRAI,government,"trai.gov.in",IN,Verified from trai.gov.in
+Cyber Crime,government,"cybercrime.gov.in",IN,Official cybercrime portal
+Google,tech,"google.com,accounts.google.com,gmail.com",Global,Verified from google.com
+Microsoft,tech,"microsoft.com,live.com,outlook.com,office.com,microsoftonline.com",Global,Verified from microsoft.com
+Apple,tech,"apple.com,icloud.com,appleid.apple.com",Global,Verified from apple.com
+Yahoo,tech,"yahoo.com,yahoomail.com",Global,Verified from yahoo.com
+Facebook,social,"facebook.com,m.facebook.com",Global,Verified from facebook.com
+Instagram,social,"instagram.com",Global,Verified from instagram.com
+WhatsApp,social,"whatsapp.com,web.whatsapp.com",Global,Verified from whatsapp.com
+X (Twitter),social,"x.com,twitter.com,t.co",Global,Verified from x.com
+LinkedIn,social,"linkedin.com",Global,Verified from linkedin.com
+Telegram,social,"telegram.org,t.me,web.telegram.org",Global,Verified from telegram.org
+YouTube,social,"youtube.com,youtu.be",Global,Verified from youtube.com
+Amazon,ecommerce,"amazon.in,amazon.com,amzn.in",IN/Global,Verified from amazon.in
+Flipkart,ecommerce,"flipkart.com",IN,Verified from flipkart.com
+Meesho,ecommerce,"meesho.com",IN,Verified from meesho.com
+India Post,logistics,"indiapost.gov.in",IN,Verified from indiapost.gov.in
+Delhivery,logistics,"delhivery.com",IN,Verified from delhivery.com
+BlueDart,logistics,"bluedart.com",IN,Verified from bluedart.com
+DHL,logistics,"dhl.com,dhl.in",Global,Verified from dhl.com
+FedEx,logistics,"fedex.com",Global,Verified from fedex.com
+Airtel,telecom,"airtel.in,airtelbank.com",IN,Verified from airtel.in
+Jio,telecom,"jio.com,jiomoney.com",IN,Verified from jio.com
+Vi (Vodafone Idea),telecom,"myvi.in,vodafone.in,idea.in",IN,Verified from myvi.in
+BSNL,telecom,"bsnl.co.in",IN,Verified from bsnl.co.in

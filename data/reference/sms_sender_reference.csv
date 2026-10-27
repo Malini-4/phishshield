@@ -1,0 +1,26 @@
+header,brand,category,source_url,last_verified
+SBIINB,SBI,bank,https://sbi.co.in,2026-03-01
+SBIPSG,SBI,bank,https://sbi.co.in,2026-03-01
+HDFCBK,HDFC Bank,bank,https://hdfcbank.com,2026-03-01
+HDFCCC,HDFC Bank,bank,https://hdfcbank.com,2026-03-01
+ICICIB,ICICI Bank,bank,https://icicibank.com,2026-03-01
+AXISBK,Axis Bank,bank,https://axisbank.com,2026-03-01
+KOTAKB,Kotak Bank,bank,https://kotak.com,2026-03-01
+PNBSMS,PNB,bank,https://pnbindia.in,2026-03-01
+BOBTXN,Bank of Baroda,bank,https://bankofbaroda.in,2026-03-01
+CANBNK,Canara Bank,bank,https://canarabank.com,2026-03-01
+UNIONB,Union Bank,bank,https://unionbankofindia.co.in,2026-03-01
+PAYTMB,Paytm Payments Bank,payment,https://paytm.com,2026-03-01
+PHONPE,PhonePe,payment,https://phonepe.com,2026-03-01
+GPAYIN,Google Pay,payment,https://pay.google.com,2026-03-01
+NPCIUP,NPCI / BHIM,payment,https://npci.org.in,2026-03-01
+AADHAR,UIDAI / Aadhaar,government,https://uidai.gov.in,2026-03-01
+ITDEFL,Income Tax Department,government,https://incometax.gov.in,2026-03-01
+EPFOHO,EPFO,government,https://epfindia.gov.in,2026-03-01
+IRCTCi,IRCTC,government,https://irctc.co.in,2026-03-01
+AMAZON,Amazon,ecommerce,https://amazon.in,2026-03-01
+FLPKRT,Flipkart,ecommerce,https://flipkart.com,2026-03-01
+AIRTEL,Airtel,telecom,https://airtel.in,2026-03-01
+JIONET,Jio,telecom,https://jio.com,2026-03-01
+VILNOT,Vi (Vodafone Idea),telecom,https://myvi.in,2026-03-01
+BSNLNO,BSNL,telecom,https://bsnl.co.in,2026-03-01

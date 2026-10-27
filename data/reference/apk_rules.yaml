@@ -1,0 +1,30 @@
+# Rules for static Android APK analysis
+rules:
+  - id: BANKING_TROJAN_PATTERN
+    severity: high
+    title: "Possible banking trojan permission pattern"
+    description: "App requests SMS read/receive, SMS send, boot persistence, and overlay/accessibility"
+    required_permissions_any_sms:
+      - android.permission.READ_SMS
+      - android.permission.RECEIVE_SMS
+    required_permissions_all:
+      - android.permission.SEND_SMS
+      - android.permission.RECEIVE_BOOT_COMPLETED
+    required_permissions_any_intercept:
+      - android.permission.SYSTEM_ALERT_WINDOW
+      - android.permission.BIND_ACCESSIBILITY_SERVICE
+
+  - id: PACKAGE_IMPERSONATION
+    severity: medium
+    title: "Package name resembles known brand"
+    description: "Package name matches a known brand token but is not on the official package list"
+
+  - id: DEBUG_FLAG
+    severity: medium
+    title: "App is debuggable"
+    description: "Production applications should not be compiled with debuggable=true"
+
+  - id: CLEARTEXT_IP_ENDPOINT
+    severity: medium
+    title: "Cleartext IP address endpoints"
+    description: "Raw HTTP URLs with IP addresses found in code"

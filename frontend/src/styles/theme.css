@@ -1,0 +1,85 @@
+:root {
+  /* ==========================================================================
+     PhishShield — Cyber Guardian Design System
+     Reference 1 (Auth Split-Screen) & Reference 2 (Interior Blue Atmosphere)
+     ========================================================================== */
+
+  /* Cyber Palette */
+  --cyber-navy-deep: #041438;
+  --cyber-navy: #061A3D;
+  --cyber-dark-blue: #0A2B68;
+  --cyber-royal-blue: #124BB5;
+  --cyber-electric-blue: #1860D8;
+  --cyber-primary: #087FF5;
+  --cyber-cyan: #16C8FF;
+  --cyber-cyan-bright: #00F0FF;
+  --cyber-light-blue: #DCEBF8;
+  --cyber-ice-blue: #EAF5FF;
+  --cyber-white: #FFFFFF;
+
+  /* Surfaces & Backgrounds */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: radial-gradient(circle at 50% 10%, #165BD0 0%, #0F43A6 35%, #082870 70%, #041438 100%);
+  --bg-tertiary: rgba(12, 36, 82, 0.75);
+  --bg-card: rgba(6, 22, 54, 0.85);
+  --bg-card-solid: #071E44;
+  --bg-dark-surface: #051433;
+
+  /* Typography */
+  --text-main: #FFFFFF;
+  --text-navy: #0B2B59;
+  --text-muted: #BFDCFC;
+  --text-subtle: #8EB1DC;
+  --text-inverse: #FFFFFF;
+  --text-cyan: #16C8FF;
+
+  /* Primary & Accent Actions */
+  --primary: #087FF5;
+  --primary-hover: #0056C6;
+  --primary-light: #16C8FF;
+  --primary-subtle: rgba(8, 127, 245, 0.2);
+  --primary-border: rgba(22, 200, 255, 0.35);
+  --primary-glow: rgba(8, 127, 245, 0.35);
+  --cyan-glow: rgba(22, 200, 255, 0.35);
+
+  /* Borders & Dividers */
+  --border-light: rgba(22, 200, 255, 0.18);
+  --border-medium: rgba(22, 200, 255, 0.3);
+  --border-sky: rgba(22, 200, 255, 0.4);
+  --border-cyan: #16C8FF;
+  --border-dark: rgba(22, 200, 255, 0.12);
+
+  /* Verdict Design Tokens (Vibrant Dark Mode Safe) */
+  --verdict-malicious-bg: rgba(239, 68, 68, 0.15);
+  --verdict-malicious-text: #FCA5A5;
+  --verdict-malicious-border: rgba(239, 68, 68, 0.5);
+
+  --verdict-suspicious-bg: rgba(245, 158, 11, 0.15);
+  --verdict-suspicious-text: #FCD34D;
+  --verdict-suspicious-border: rgba(245, 158, 11, 0.5);
+
+  --verdict-clean-bg: rgba(16, 185, 129, 0.15);
+  --verdict-clean-text: #6EE7B7;
+  --verdict-clean-border: rgba(16, 185, 129, 0.5);
+
+  --verdict-inconclusive-bg: rgba(148, 163, 184, 0.15);
+  --verdict-inconclusive-text: #CBD5E1;
+  --verdict-inconclusive-border: rgba(148, 163, 184, 0.4);
+
+  /* Severities */
+  --severity-high: #EF4444;
+  --severity-medium: #F59E0B;
+  --severity-low: #16C8FF;
+  --severity-info: #8EB1DC;
+
+  /* Layout & Spacing */
+  --sidebar-width: 250px;
+  --topbar-height: 64px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  --shadow-sm: 0 4px 12px rgba(3, 12, 32, 0.25);
+  --shadow-md: 0 10px 30px rgba(3, 12, 32, 0.45);
+  --shadow-lg: 0 20px 50px rgba(3, 12, 32, 0.6);
+  --shadow-glow: 0 0 22px rgba(22, 200, 255, 0.3);
+}

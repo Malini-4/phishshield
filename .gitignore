@@ -1,0 +1,61 @@
+# Environment
+.env
+*.env.local
+
+# Python
+backend/.venv
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Models (large binary artifacts)
+models/*.joblib
+models/*.pkl
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Data (raw/processed datasets can be large)
+data/raw/
+data/processed/
+
+# Uploads
+uploads/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/node_modules/
+
+# Reports (generated)
+reports/*.json
+reports/*.csv
+reports/*.png
+
+# PDFs
+*.pdf
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

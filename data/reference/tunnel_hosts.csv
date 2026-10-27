@@ -1,0 +1,32 @@
+host_suffix,kind,note
+trycloudflare.com,tunnel,Cloudflare Tunnel – free, temporary, legitimate developer use
+cfargotunnel.com,tunnel,Cloudflare Argo Tunnel
+loca.lt,tunnel,LocalTunnel service
+serveo.net,tunnel,Serveo SSH tunnel
+ngrok-free.app,tunnel,ngrok free tier
+ngrok.io,tunnel,ngrok (older domain)
+localhost.run,tunnel,localhost.run SSH tunneling
+pinggy.io,tunnel,Pinggy tunnel service
+expose.sh,tunnel,Expose tunnel service
+loophole.site,tunnel,Loophole tunnel
+hookdeck.com,tunnel,Hookdeck webhook tunnel
+netlify.app,free-hosting,Netlify deployment platform – mostly legitimate
+github.io,dev-platform,GitHub Pages – mostly legitimate
+vercel.app,free-hosting,Vercel deployment platform – mostly legitimate
+web.app,free-hosting,Firebase Hosting by Google – mostly legitimate
+pages.dev,free-hosting,Cloudflare Pages – mostly legitimate
+workers.dev,free-hosting,Cloudflare Workers – mostly legitimate
+glitch.me,free-hosting,Glitch code hosting platform
+repl.co,dev-platform,Replit hosting
+replit.dev,dev-platform,Replit hosting
+herokuapp.com,free-hosting,Heroku PaaS – mostly legitimate
+000webhostapp.com,free-hosting,000webhost free hosting – frequently abused
+byethost.com,free-hosting,byethost free hosting – frequently abused
+freehosting.com,free-hosting,freehosting.com – sometimes abused
+infinityfree.net,free-hosting,InfinityFree – sometimes abused
+atwebpages.com,free-hosting,atwebpages free hosting
+wixsite.com,website-builder,Wix website builder – mostly legitimate
+weebly.com,website-builder,Weebly website builder – mostly legitimate
+wordpress.com,website-builder,WordPress.com – mostly legitimate
+blogspot.com,website-builder,Google Blogger – mostly legitimate
+tumblr.com,website-builder,Tumblr – mostly legitimate
