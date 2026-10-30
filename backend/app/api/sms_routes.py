@@ -60,4 +60,44 @@ async def analyze_sms(
     inv_id = save_investigation(db, result, sms_details, duration_ms, input_hash, user_id=user_id)
     result.saved = inv_id is not None
 
-    return result.model_dump()
+    case_id = None
+    if current_user and inv_id:
+        try:
+            db.commit()
+            from app.cases.service import process_investigation
+            case_id = process_investigation(
+                db, inv_id, current_user["id"], result.model_dump(), sms_details
+            )
+            if case_id:
+                result.case_id = case_id
+                # Automatically analyse up to 3 links inside suspicious SMS
+                extracted_urls = sms_details.get("extracted_urls") or []
+                if extracted_urls:
+                    from app.services.url_service import UrlAnalysisService
+                    url_service = UrlAnalysisService()
+                    for u in extracted_urls[:3]:
+                        try:
+                            u_res, u_det = await url_service.analyse(u, db)
+                            u_hash = hashlib.sha256(u.encode()).hexdigest()
+                            u_inv_id = save_investigation(
+                                db, u_res, u_det, 0, u_hash, user_id=current_user["id"]
+                            )
+                            db.commit()
+                            if u_inv_id:
+                                process_investigation(
+                                    db,
+                                    u_inv_id,
+                                    current_user["id"],
+                                    u_res.model_dump(),
+                                    u_det,
+                                    target_case_id=case_id,
+                                )
+                        except Exception as e_url:
+                            logger.warning(f"Auto-analysis of SMS link {u} failed: {e_url}")
+        except Exception as e:
+            logger.warning(f"Failed to process case for SMS investigation {inv_id}: {e}")
+
+    resp = result.model_dump()
+    if case_id:
+        resp["case_id"] = case_id
+    return resp

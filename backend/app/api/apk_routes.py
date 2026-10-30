@@ -80,5 +80,21 @@ async def analyze_apk(
     inv_id = save_investigation(db, result, apk_details, duration_ms, input_hash, user_id=user_id)
     result.saved = inv_id is not None
 
-    return result.model_dump()
+    case_id = None
+    if current_user and inv_id:
+        try:
+            db.commit()
+            from app.cases.service import process_investigation
+            case_id = process_investigation(
+                db, inv_id, current_user["id"], result.model_dump(), apk_details
+            )
+            if case_id:
+                result.case_id = case_id
+        except Exception as e:
+            logger.warning(f"Failed to process case for APK investigation {inv_id}: {e}")
+
+    resp = result.model_dump()
+    if case_id:
+        resp["case_id"] = case_id
+    return resp
 

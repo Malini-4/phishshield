@@ -35,6 +35,14 @@ async def lifespan(app: FastAPI):
     init_db()
     logger.info("Database initialised")
 
+    # Initialise case tables
+    try:
+        from app.cases.store import init_case_tables
+        init_case_tables()
+        logger.info("Case tables initialised")
+    except Exception as e:
+        logger.error(f"Failed to initialise case tables: {e}")
+
     # Pre-load model (non-blocking; log result)
     from app.services.model_loader import try_load_model
     model, err = try_load_model()
@@ -114,9 +122,11 @@ def create_app() -> FastAPI:
     from app.api.screenshot_routes import router as screenshot_router
     from app.api.history_routes import router as history_router
     from app.api.auth_routes import router as auth_router
+    from app.api.case_routes import router as case_router
 
     app.include_router(health_router, prefix="/api")
     app.include_router(auth_router, prefix="/api")
+    app.include_router(case_router, prefix="/api")
     app.include_router(url_router, prefix="/api/url")
     app.include_router(apk_router, prefix="/api/apk")
     app.include_router(sms_router, prefix="/api/sms")

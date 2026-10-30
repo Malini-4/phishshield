@@ -40,7 +40,7 @@ DISPLAY_LABELS: Dict[str, Dict[str, str]] = {
         "malicious": "Likely scam",
         "suspicious": "Suspicious message",
         "clean_no_findings": "No strong warning signs found",
-        "inconclusive": "Could not verify",
+        "inconclusive": "Not enough evidence",
     },
     "screenshot": {
         "malicious": "Suspicious or inconsistent evidence",
@@ -108,6 +108,7 @@ class AnalysisResult(BaseModel):
     model_version: Optional[str] = None
     input_summary: str = ""
     saved: bool = False
+    case_id: Optional[str] = None
 
 
 def make_display_label(module: str, verdict: Verdict) -> str:

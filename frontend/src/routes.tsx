@@ -12,6 +12,8 @@ import { ScreenshotAnalysisPage } from './pages/ScreenshotAnalysisPage';
 import { HistoryPage } from './pages/HistoryPage';
 import { ReportDetailsPage } from './pages/ReportDetailsPage';
 import { AccountPage } from './pages/AccountPage';
+import { CasesPage } from './pages/CasesPage';
+import { CaseDetailPage } from './pages/CaseDetailPage';
 
 export const routes: RouteObject[] = [
   {
@@ -35,6 +37,8 @@ export const routes: RouteObject[] = [
       { path: 'apk', element: <ApkAnalysisPage /> },
       { path: 'sms', element: <SmsAnalysisPage /> },
       { path: 'screenshot', element: <ScreenshotAnalysisPage /> },
+      { path: 'cases', element: <CasesPage /> },
+      { path: 'cases/:id', element: <CaseDetailPage /> },
       { path: 'history', element: <HistoryPage /> },
       { path: 'history/:id', element: <ReportDetailsPage /> },
       { path: 'account', element: <AccountPage /> },

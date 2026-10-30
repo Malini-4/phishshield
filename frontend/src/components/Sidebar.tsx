@@ -10,6 +10,7 @@ import {
   Smartphone,
   MessageSquare,
   Receipt,
+  FolderOpen,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -31,6 +32,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const mainNavItems = [
     { to: '/', label: 'Analyse', icon: Search },
     { to: '/history', label: 'My investigations', icon: History },
+    { to: '/cases', label: 'Cases', icon: FolderOpen },
     { to: '/account', label: 'My account', icon: User },
   ];
 

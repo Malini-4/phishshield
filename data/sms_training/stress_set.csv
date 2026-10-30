@@ -1,0 +1,51 @@
+text,label,category,notes
+"Sir, your cheque 401829 has been cleared today for amount 15000.",0,banking,legitimate clearing alert
+"Welcome to SBI! Your new account has been activated. Visit branch to collect cheque book.",0,banking,welcome message
+"Your FD maturing on 12-Nov has been renewed for 1 year at 6.8% interest.",0,banking,deposit renewal
+"Salary for October has been credited to your account. Net amount: 65,400.",0,banking,salary credit
+"Reminder: Car service scheduled tomorrow at 10am at Hyundai Motor Plaza.",0,service,service appointment
+"Your Uber ride is arriving in a White Swift Dzire, driver: Rajesh.",0,ride,ride hailing
+"Gym membership renewal confirmation. Thank you for paying 3500.",0,service,membership renewal
+"Society maintenance dues for flat 402 is pending. Please pay before 5th.",0,bill,housing society
+"Your Amazon Prime subscription will renew in 3 days. Card will be charged 1499.",0,subscription,subscription notice
+"School bus reached school safely. Student: Aarav Sharma.",0,notice,school alert
+"Flight 6E-204 boarding has started at Gate 14. Have a safe journey.",0,travel,airline alert
+"Electricity bill paid successfully. Receipt no. 9283749. Thanks.",0,bill,payment receipt
+"Are you free tonight? Let's catch up over coffee near CP.",0,personal,casual chat
+"Doctor confirmed appointment for tomorrow 4pm.",0,service,doctor visit
+"Your Swiggy order has been picked up. Enjoy your meal.",0,delivery,food delivery
+"Domino's Pizza is in the oven! Fresh and hot delivery soon.",0,delivery,food delivery
+"Please send the presentation slides by 11 AM tomorrow.",0,work,colleague chat
+"Zomato Gold membership activated for 3 months.",0,subscription,food app
+"Happy birthday! Wishing you health and prosperity from HDFC family.",0,greeting,bank birthday greeting
+"Your EPF passbook has been updated with monthly contribution of Rs 3,600.",0,government,epfo alert
+"Passport appointment confirmed at PSK Delhi on 15-Nov at 10:15 AM.",0,government,passport seva
+"LPG cylinder refill booked. Cash on delivery Rs 850. Delivery within 2 days.",0,utility,gas booking
+"Your metro smart card recharge of Rs 500 was successful via UPI.",0,transit,metro card
+"Sir kindly sign the lease agreement copy sent on your email.",0,business,lease document
+"Movie tickets booked! Inox Nehru Place, Hall 3, Seat E12-13 for today 7:30 PM.",0,entertainment,movie ticket
+"Final legal reminder: CBI cyber cell has initiated criminal proceedings against you. Call 9811002233.",1,digital_arrest,cbi threat
+"Dear subscriber, your Netflix account is on hold due to billing issue. Update card at netflix-verify-pay.org",1,phishing,netflix credential theft
+"Customs seizure: Your parcel from UK has gold and foreign currency. Pay customs penalty 45,000 to avoid arrest.",1,parcel_scam,customs extortion
+"Your WhatsApp account will expire today. Pay 100 rupees at wa-renew.xyz to continue usage.",1,subscription_scam,whatsapp renewal
+"Dear employee, claim your Diwali bonus of Rs 15,000 credited to company portal: bonus-payroll-login.live",1,phishing,bonus credential lure
+"Instant loan sanctioned: Rs 5,00,000 transferred to wallet. Enter OTP sent to phone to disburse cash.",1,loan_scam,fake loan otp
+"TRAI notice: Disconnection order issued for your number. Contact telecom inspector immediately on 9988112233.",1,sim_block,trai extortion
+"Your PAN has been flagged for money laundering transactions in Mumbai branch. Report to cyber inspector.",1,digital_arrest,money laundering scare
+"Pay electricity bill 2940 immediately or light will be cut in 30 minutes from power grid. Officer 9876543210.",1,electricity,bijli scam
+"Dear customer your a/c KYC is expired today. Plz update aadhaar at sbi-online-service.in to keep active.",1,kyc,shorthand kyc scam
+"Wrong transaction: I accidentally paid 4,000 to your Google Pay number. Please return to 9812345678.",1,wrong_payment,paid by mistake
+"Work 2 hours daily and earn 3000 to 5000 from mobile. Like short videos on YouTube and get paid. WhatsApp 9123456789.",1,job,part time task scam
+"Income Tax refund of 18,420 is pending for transfer. Submit bank details at incometax-gov-in.site",1,tax_refund,tax refund phishing
+"Dear user, you won cash reward 75,000 from PhonePe Diwali lucky spin! Click claim-phonepe-reward.top",1,lottery,cashback reward
+"URGENT: Install SBI Quick Safety APK from sbi-sec.apk to prevent fraudulent debits from your savings account.",1,fake_apk,trojan apk lure
+"Aadhaar suspended by UIDAI: Biometric verification required. Click link uidai-reactivate.xyz",1,aadhaar,aadhaar phishing
+"Mumbai Police Notice: You are involved in illegal hawala transfer. Virtual court hearing scheduled today.",1,digital_arrest,police digital arrest
+"Dear sir your electricity will be disconnected tonight by officer. Pay bill via link or call 9876501234.",1,electricity,power cut
+"Lucky draw winner: iPhone 16 Pro waiting for delivery. Pay courier charge Rs 199 at win-apple.site",1,lottery,gift shipping scam
+"Your bank account has been credited with Rs 50,000 part time commission. Register your withdrawal at t.me/fastcash_india",1,investment,telegram crypto scam
+"TRAI verification pending: Call 9811220099 to avoid SIM deactivation.",1,sim_block,trai verification
+"Aapka gas connection block hone wala hai, turant update kare gas-kyc.site par.",1,utility,hinglish gas kyc
+"Galti se 2000 bhej diye, please wapas bhej do mere number par.",1,wrong_payment,hinglish wrong payment
+"KBC Head Office: Aapke number par 25 lakh ka lottery hai. Call manager at 9811224466.",1,lottery,kbc lottery
+"Loan approved Rs 2,00,000 with zero cibil. Install app now: bit.ly/cashloan24",1,loan,instant loan apk

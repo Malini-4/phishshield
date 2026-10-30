@@ -4,12 +4,15 @@ Never executes, installs or emulates the APK.
 """
 from __future__ import annotations
 
+import csv
 import hashlib
 import logging
 import time
 import uuid
 import zipfile
 from datetime import datetime, timezone
+from functools import lru_cache
+from pathlib import Path
 from typing import Optional
 
 from app.config import get_settings
@@ -19,6 +22,7 @@ from app.schemas.shared import (
 )
 
 logger = logging.getLogger(__name__)
+_DATA_DIR = Path(__file__).parent.parent.parent.parent / "data" / "reference"
 
 SENSITIVE_PERMISSIONS = {
     "android.permission.READ_SMS": ("high", "Can read all your SMS messages"),
@@ -41,15 +45,25 @@ SENSITIVE_PERMISSIONS = {
     "android.permission.WRITE_SETTINGS": ("medium", "Can change system settings"),
 }
 
+POWERFUL_PERMISSIONS = {
+    "android.permission.READ_SMS",
+    "android.permission.RECEIVE_SMS",
+    "android.permission.SEND_SMS",
+    "android.permission.BIND_ACCESSIBILITY_SERVICE",
+    "android.permission.SYSTEM_ALERT_WINDOW",
+    "android.permission.REQUEST_INSTALL_PACKAGES",
+    "android.permission.BIND_DEVICE_ADMIN",
+}
+
 SUSPICIOUS_STRINGS = [
-    ("api.telegram.org", "high", "Telegram bot API endpoint"),
-    ("DexClassLoader", "high", "Dynamic code loading (malware indicator)"),
-    ("Runtime.exec", "high", "Shell command execution"),
-    ("AccessibilityService", "medium", "Accessibility service reference"),
-    ("BIND_ACCESSIBILITY_SERVICE", "medium", "Accessibility binding reference"),
-    ("WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY", "medium", "Screen overlay"),
-    ("SmsManager.sendTextMessage", "high", "SMS sending code"),
-    ("TelephonyManager.getDeviceId", "medium", "Device ID collection"),
+    ("api.telegram.org", "medium", "Telegram bot API endpoint"),
+    ("DexClassLoader", "medium", "Dynamic code loading (malware indicator)"),
+    ("Runtime.exec", "low", "Shell command execution"),
+    ("AccessibilityService", "low", "Accessibility service reference"),
+    ("BIND_ACCESSIBILITY_SERVICE", "low", "Accessibility binding reference"),
+    ("WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY", "low", "Screen overlay"),
+    ("SmsManager.sendTextMessage", "medium", "SMS sending code"),
+    ("TelephonyManager.getDeviceId", "low", "Device ID collection"),
 ]
 
 OFFICIAL_PACKAGES = {
@@ -65,6 +79,53 @@ OFFICIAL_PACKAGES = {
     "com.amazon.mShop.android.shopping": "Amazon",
     "com.flipkart.android": "Flipkart",
 }
+
+
+@lru_cache(maxsize=1)
+def load_trusted_apps() -> dict[str, dict]:
+    path = _DATA_DIR / "trusted_apps.csv"
+    trusted = {}
+    if not path.exists():
+        return trusted
+    try:
+        with open(path, encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                pkg = (row.get("package") or "").strip()
+                if pkg:
+                    trusted[pkg] = dict(row)
+    except Exception as e:
+        logger.error(f"Failed to load trusted apps: {e}")
+    return trusted
+
+
+def assess_trust(package: Optional[str], cert_fingerprints: Optional[list[str]] = None) -> str:
+    """
+    Returns:
+    - 'verified' (cert matches)
+    - 'cert_mismatch' (known package, cert on file, different signer -> HIGH finding)
+    - 'known_unverified' (listed but no cert on file -> info only)
+    - 'unknown'
+    """
+    if not package or not package.strip():
+        return "unknown"
+    pkg = package.strip()
+    trusted = load_trusted_apps()
+    if pkg not in trusted:
+        return "unknown"
+
+    entry = trusted[pkg]
+    stored_cert = (entry.get("cert_sha256") or "").strip().lower()
+    fingerprints = [c.strip().lower() for c in (cert_fingerprints or []) if c and c.strip()]
+
+    if stored_cert:
+        if any(f == stored_cert for f in fingerprints):
+            return "verified"
+        if fingerprints:
+            return "cert_mismatch"
+        return "known_unverified"
+
+    return "known_unverified"
 
 
 def _compute_hashes(data: bytes) -> tuple[str, str]:
@@ -138,6 +199,36 @@ def _parse_with_androguard(data: bytes) -> Optional[dict]:
         except Exception as e:
             logger.debug(f"DEX string scan failed: {e}")
 
+        # Debuggable attribute check
+        debuggable = False
+        try:
+            val = apk.get_attribute_value("application", "debuggable")
+            if isinstance(val, str):
+                debuggable = val.strip().lower() in ("true", "1")
+            elif isinstance(val, bool):
+                debuggable = val
+            elif val is not None:
+                debuggable = bool(val)
+        except Exception as e:
+            logger.debug(f"Failed to read debuggable: {e}")
+
+        # Signing certificate fingerprints
+        cert_hashes: list[str] = []
+        try:
+            certs = apk.get_certificates() or []
+            for cert in certs:
+                try:
+                    if hasattr(cert, "dump"):
+                        raw_bytes = cert.dump()
+                        if isinstance(raw_bytes, bytes):
+                            cert_hashes.append(hashlib.sha256(raw_bytes).hexdigest().lower())
+                    elif hasattr(cert, "sha256"):
+                        cert_hashes.append(str(cert.sha256).lower())
+                except Exception as ce:
+                    logger.debug(f"Failed to dump certificate: {ce}")
+        except Exception as e:
+            logger.debug(f"apk.get_certificates failed: {e}")
+
         return {
             "package_name": apk.get_package(),
             "app_label": apk.get_app_name(),
@@ -149,8 +240,9 @@ def _parse_with_androguard(data: bytes) -> Optional[dict]:
             "activities": activities,
             "services": services,
             "receivers": receivers,
-            "debuggable": False,  # safe default
+            "debuggable": debuggable,
             "allow_backup": False,
+            "certificates": cert_hashes,
             "strings": strings_found,
             "parser": "androguard",
         }
@@ -180,6 +272,7 @@ def _parse_with_pyaxmlparser(data: bytes) -> Optional[dict]:
             "receivers": [],
             "debuggable": False,
             "allow_backup": False,
+            "certificates": [],
             "strings": [],
             "parser": "pyaxmlparser",
         }
@@ -211,6 +304,7 @@ def _parse_minimal_zip(data: bytes) -> Optional[dict]:
                 "receivers": [],
                 "debuggable": False,
                 "allow_backup": False,
+                "certificates": [],
                 "strings": [],
                 "parser": "minimal_zip",
             }
@@ -233,8 +327,37 @@ def _classify_permissions(permissions: list[str]) -> list[dict]:
 def _apply_apk_rules(parsed: dict) -> list[EvidenceItem]:
     evidence = []
     permissions = set(parsed.get("permissions", []))
+    pkg = parsed.get("package_name", "") or ""
+    cert_fingerprints = parsed.get("certificates", [])
 
-    # Rule 1: SMS trojan pattern
+    # Trust assessment from reference catalog
+    trust_status = assess_trust(pkg, cert_fingerprints)
+    if trust_status == "cert_mismatch":
+        evidence.append(EvidenceItem(
+            category="CERT_MISMATCH",
+            severity=Severity.high,
+            title="Signing certificate mismatch for known app",
+            detail=f"Package '{pkg}' is in the trusted catalog, but its signing certificate does not match the registered certificate fingerprint. This strongly indicates a repackaged or counterfeit APK.",
+            source=EvidenceSource.rule,
+        ))
+    elif trust_status == "known_unverified":
+        evidence.append(EvidenceItem(
+            category="TRUSTED_APP_INFO",
+            severity=Severity.info,
+            title="Known application catalog entry",
+            detail=f"Package '{pkg}' matches a known application in our reference catalog (no certificate fingerprint on file).",
+            source=EvidenceSource.rule,
+        ))
+    elif trust_status == "verified":
+        evidence.append(EvidenceItem(
+            category="TRUSTED_APP_VERIFIED",
+            severity=Severity.info,
+            title="Verified application signature",
+            detail=f"Package '{pkg}' certificate fingerprint matches the trusted catalog.",
+            source=EvidenceSource.rule,
+        ))
+
+    # Combinations & Trojan patterns
     sms_read = "android.permission.READ_SMS" in permissions
     sms_send = "android.permission.SEND_SMS" in permissions
     sms_receive = "android.permission.RECEIVE_SMS" in permissions
@@ -242,7 +365,8 @@ def _apply_apk_rules(parsed: dict) -> list[EvidenceItem]:
     overlay = "android.permission.SYSTEM_ALERT_WINDOW" in permissions
     accessibility = "android.permission.BIND_ACCESSIBILITY_SERVICE" in permissions
 
-    if (sms_read or sms_receive) and sms_send and boot_recv and (overlay or accessibility):
+    has_banking_trojan = (sms_read or sms_receive) and sms_send and boot_recv and (overlay or accessibility)
+    if has_banking_trojan:
         evidence.append(EvidenceItem(
             category="BANKING_TROJAN_PATTERN",
             severity=Severity.high,
@@ -252,16 +376,47 @@ def _apply_apk_rules(parsed: dict) -> list[EvidenceItem]:
             source=EvidenceSource.rule,
         ))
 
+    # Combination: READ/RECEIVE_SMS + overlay or accessibility (medium)
+    if (sms_read or sms_receive) and (overlay or accessibility) and not has_banking_trojan:
+        evidence.append(EvidenceItem(
+            category="SMS_OVERLAY_COMBO",
+            severity=Severity.medium,
+            title="SMS access combined with screen overlay or accessibility",
+            detail="App requests both SMS interception and overlay/accessibility permissions, which can be abused to steal 2FA codes and overlay phishing interfaces.",
+            source=EvidenceSource.rule,
+        ))
+
+    # Combination: READ/RECEIVE_SMS + api.telegram.org in code (high)
+    has_telegram = any(
+        s.get("value") == "api.telegram.org" or "api.telegram.org" in str(s.get("value", ""))
+        for s in parsed.get("strings", [])
+    )
+    if (sms_read or sms_receive) and has_telegram:
+        evidence.append(EvidenceItem(
+            category="SMS_TELEGRAM_EXFILTRATION",
+            severity=Severity.high,
+            title="SMS access combined with Telegram API endpoint",
+            detail="App requests SMS access and includes api.telegram.org in code, a classic pattern for SMS stealer command-and-control exfiltration.",
+            source=EvidenceSource.rule,
+        ))
+
     # Rule 2: Package name impersonation
-    pkg = parsed.get("package_name", "") or ""
     brand_tokens = {"sbi", "hdfc", "icici", "paytm", "phonepe", "gpay", "bhim",
                     "google", "whatsapp", "facebook", "instagram", "amazon", "flipkart"}
+    trusted = load_trusted_apps()
+    is_known = pkg in trusted or pkg in OFFICIAL_PACKAGES
     for brand in brand_tokens:
-        if brand in pkg.lower() and pkg not in OFFICIAL_PACKAGES:
+        if brand in pkg.lower() and not is_known:
+            official_prefixes = (
+                "com.google.", "com.whatsapp", "com.facebook.",
+                "com.instagram.", "com.amazon.", "in.amazon.", "com.flipkart."
+            )
+            is_sub_brand = any(pkg.startswith(p) for p in official_prefixes)
+            sev = Severity.low if is_sub_brand else Severity.medium
             evidence.append(EvidenceItem(
                 category="PACKAGE_IMPERSONATION",
-                severity=Severity.medium,
-                title=f"Package name resembles '{brand}' but is not the official app",
+                severity=sev,
+                title=f"Package name resembles '{brand}' (sub-brand / legitimate prefix)" if is_sub_brand else f"Package name resembles '{brand}' but is not the official app",
                 detail=f"Package '{pkg}' contains '{brand}' but doesn't match any known official package ID.",
                 source=EvidenceSource.rule,
             ))
@@ -304,18 +459,26 @@ def _apply_apk_rules(parsed: dict) -> list[EvidenceItem]:
             source=EvidenceSource.parser,
         ))
 
-    # Add individual high-severity permissions as evidence
-    for perm in permissions:
-        if perm in SENSITIVE_PERMISSIONS:
-            sev_str, desc = SENSITIVE_PERMISSIONS[perm]
-            if sev_str == "high":
-                evidence.append(EvidenceItem(
-                    category="SENSITIVE_PERMISSION",
-                    severity=Severity.medium,
-                    title=f"Sensitive permission: {perm.split('.')[-1]}",
-                    detail=desc,
-                    source=EvidenceSource.parser,
-                ))
+    # Powerful permissions: Add ONE note instead of a medium finding per permission.
+    # Medium only if the app is unknown AND has 4 or more powerful permissions.
+    powerful_found = [p for p in permissions if p in POWERFUL_PERMISSIONS]
+    if powerful_found:
+        if trust_status == "unknown" and len(powerful_found) >= 4:
+            evidence.append(EvidenceItem(
+                category="POWERFUL_PERMISSIONS",
+                severity=Severity.medium,
+                title=f"Multiple powerful permissions requested ({len(powerful_found)})",
+                detail=f"Unknown app requests {len(powerful_found)} powerful permissions: {', '.join(p.split('.')[-1] for p in powerful_found)}.",
+                source=EvidenceSource.parser,
+            ))
+        else:
+            evidence.append(EvidenceItem(
+                category="POWERFUL_PERMISSIONS",
+                severity=Severity.low,
+                title=f"Powerful permissions requested ({len(powerful_found)})",
+                detail=f"App requests powerful permission(s): {', '.join(p.split('.')[-1] for p in powerful_found)}.",
+                source=EvidenceSource.parser,
+            ))
 
     return evidence
 

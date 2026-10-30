@@ -21,6 +21,7 @@ from app.schemas.shared import (
 )
 from app.security.domain_checks import check_domain, load_brand_domains
 from app.security.url_parser import parse_url
+from app.services.sms_text import expand_shorthand, split_sender
 
 logger = logging.getLogger(__name__)
 _DATA_DIR = Path(__file__).parent.parent.parent.parent / "data" / "reference"
@@ -98,18 +99,17 @@ def verify_sender(sender: Optional[str]) -> dict:
             "detail": "Sender reference data is not loaded.",
         }
 
-    # Extract core header if formatted like 'VK-HDFCBK' or 'BW-SBIINB'
-    header_core = raw.upper()
-    if "-" in header_core:
-        parts = header_core.split("-", 1)
-        # Prefix is typically 2 letters in India
-        if len(parts[0]) in (2, 3) and parts[0].isalpha():
-            header_core = parts[1]
+    # Extract core header using split_sender (supports VK-SBIINB, vk SBIINB, VK_SBIINB, etc.)
+    header_core = split_sender(raw)
 
-    # Exact match check
+    # Exact match check (also accept an 8-character glued form like VKHDFCBK)
     for entry in reference:
         ref_h = entry["header"].upper()
-        if header_core == ref_h or raw.upper() == ref_h:
+        if (
+            header_core == ref_h
+            or raw.upper() == ref_h
+            or (len(header_core) == 8 and header_core[:2].isalpha() and header_core[2:] == ref_h)
+        ):
             return {
                 "state": "exact_match",
                 "brand": entry.get("brand"),
@@ -118,10 +118,13 @@ def verify_sender(sender: Optional[str]) -> dict:
             }
 
     # Lookalike check
+    candidate_header = header_core[2:] if (len(header_core) == 8 and header_core[:2].isalpha()) else header_core
     for entry in reference:
         ref_h = entry["header"].upper()
-        dist = _levenshtein(header_core, ref_h)
-        if 0 < dist <= 1 and len(header_core) >= 4:
+        dist1 = _levenshtein(header_core, ref_h) if len(header_core) >= 4 else 99
+        dist2 = _levenshtein(candidate_header, ref_h) if len(candidate_header) >= 4 else 99
+        dist = min(dist1, dist2)
+        if 0 < dist <= 1:
             return {
                 "state": "possible_lookalike",
                 "brand": entry.get("brand"),
@@ -205,8 +208,24 @@ URGENCY_PATTERNS = [
 ]
 
 KYC_PATTERNS = [
+    (r"(?:update|complete|verify|link|submit|renew)\s+(?:your|the|ur)\s+(?:kyc|pan|aadhaar)", "Demands user to update/complete/verify/link/submit/renew KYC or identification details"),
+    (r"kyc\s+(?:is\s+required|has\s+expired|not\s+updated|mandatory|pending|suspended|incomplete)", "Warning that KYC is required, has expired, or is not updated"),
     (r"(?:kyc|pan|aadhaar)\s*(?:update|verification|pending|expired|suspended|mandatory|link|incomplete)", "Demands urgent KYC / document update"),
     (r"update\s+your\s+kyc|complete\s+your\s+kyc|kyc\s+is\s+required", "Requests user to complete KYC to prevent penalties"),
+]
+
+WRONG_PAYMENT_PATTERNS = [
+    (r"(?:paid|sent|transferred).{0,40}(?:by\s+mistake|by\s+error|accidentally).{0,60}(?:send\s+it\s+back|return\s+it|refund\s+it|transfer\s+back|pay\s+back|send\s+back)", "Wrong-payment / paid-by-mistake refund scam"),
+    (r"(?:by\s+mistake|by\s+error|accidentally).{0,50}(?:send\s+it\s+back|return\s+it|refund\s+it|transfer\s+back|pay\s+back|send\s+back)", "Claims accidental payment and requests money sent back"),
+    (r"(?:sent|paid)\s+to\s+wrong\s+(?:account|upi|number).{0,60}(?:return|refund|send\s+back)", "Wrong-account payment scam"),
+    (r"(?:by\s+mistake|accidentally).{0,30}(?:money\s+transferred|amount\s+sent|rs\.?\s*\d+|₹\s*\d+).{0,50}(?:return|send\s+back|refund)", "Claims payment sent by mistake and requests return of funds"),
+]
+
+LAW_ENFORCEMENT_PATTERNS = [
+    (r"digital\s+arrest", "Fabricated 'digital arrest' extortion threat"),
+    (r"money\s+laundering", "False money laundering accusation used for extortion"),
+    (r"(?:cbi|customs|cyber\s*crime)\s*(?:officer|dept|department|notice|investigation|inspector|cell)", "Law enforcement or customs officer impersonation"),
+    (r"(?:police\s+officer|crime\s+branch|narcotics\s+control|enforcement\s+directorate)", "Police or enforcement directorate impersonation"),
 ]
 
 FINANCIAL_SCAM_PATTERNS = [
@@ -244,9 +263,10 @@ def analyse_sms_text(
     extracted_urls: list[str],
 ) -> list[EvidenceItem]:
     evidence: list[EvidenceItem] = []
-    norm = normalise_text(text)
+    expanded = expand_shorthand(text)
+    norm = normalise_text(expanded)
     norm_lower = norm.lower()
-    is_legit_warning = _has_legitimate_warning(text)
+    is_legit_warning = _has_legitimate_warning(text) or _has_legitimate_warning(expanded)
 
     # 1. Credential theft check
     has_cred_attempt = False
@@ -307,6 +327,30 @@ def analyse_sms_text(
                 severity=Severity.medium,
                 title="Common scam lure detected",
                 detail=f"{desc}.",
+                source=EvidenceSource.rule,
+            ))
+            break
+
+    # 4b. Wrong payment scam
+    for pat, desc in WRONG_PAYMENT_PATTERNS:
+        if re.search(pat, norm_lower):
+            evidence.append(EvidenceItem(
+                category="WRONG_PAYMENT_SCAM",
+                severity=Severity.medium,
+                title="Wrong-payment refund scam lure",
+                detail=f"{desc}. Scammers pretend to have transferred money accidentally to trick victims into sending real funds.",
+                source=EvidenceSource.rule,
+            ))
+            break
+
+    # 4c. Law enforcement impersonation / digital arrest
+    for pat, desc in LAW_ENFORCEMENT_PATTERNS:
+        if re.search(pat, norm_lower):
+            evidence.append(EvidenceItem(
+                category="LAW_ENFORCEMENT_IMPERSONATION",
+                severity=Severity.high,
+                title="Law enforcement impersonation or 'digital arrest' threat",
+                detail=f"{desc}. Official agencies never arrest citizens virtually or demand compliance over SMS.",
                 source=EvidenceSource.rule,
             ))
             break
@@ -396,7 +440,11 @@ def analyse_sms_text(
     return evidence
 
 
-def _decide_sms_verdict(evidence: list[EvidenceItem], text: str) -> Verdict:
+def _decide_sms_verdict(
+    evidence: list[EvidenceItem],
+    text: str,
+    sender_result: Optional[dict] = None,
+) -> Verdict:
     if len(text.strip()) < 5:
         return Verdict.inconclusive
 
@@ -406,13 +454,25 @@ def _decide_sms_verdict(evidence: list[EvidenceItem], text: str) -> Verdict:
     if high_count >= 1:
         return Verdict.malicious
 
-    if medium_count >= 2:
+    if medium_count >= 1:
         return Verdict.suspicious
 
-    if medium_count == 1:
-        return Verdict.suspicious
+    # No rule found anything (no high, no medium)
+    # Return clean_no_findings ONLY when the sender is an exact verified DLT match,
+    # or a standard bank "do not share OTP" warning is present. Otherwise return inconclusive.
+    has_exact_sender = (
+        (sender_result is not None and sender_result.get("state") == "exact_match")
+        or any(e.category == "SENDER_VERIFIED" for e in evidence)
+    )
+    has_otp_warning = (
+        _has_legitimate_warning(text)
+        or any(e.category == "LEGITIMATE_SECURITY_BOILERPLATE" for e in evidence)
+    )
 
-    return Verdict.clean_no_findings
+    if has_exact_sender or has_otp_warning:
+        return Verdict.clean_no_findings
+
+    return Verdict.inconclusive
 
 
 def _redact_sensitive(text: str) -> str:
@@ -498,7 +558,50 @@ class SmsAnalysisService:
             detail=f"Evaluated rules; {len(evidence)} evidence finding(s).",
         ))
 
-        verdict = _decide_sms_verdict(evidence, message)
+        # ML model prediction
+        model_version: Optional[str] = None
+        try:
+            from app.services.sms_ml import predict_sms
+            ml_pred = predict_sms(message)
+            if ml_pred.get("available"):
+                model_version = ml_pred.get("model_version")
+                prob = ml_pred.get("scam_probability", 0.0)
+                if prob >= 0.85:
+                    evidence.append(EvidenceItem(
+                        category="ML_SCAM_LANGUAGE",
+                        severity=Severity.medium,
+                        title="Scam language model indicates high risk",
+                        detail=f"Scam language classification probability: {prob:.1%}.",
+                        source=EvidenceSource.model,
+                    ))
+                elif prob >= 0.50:
+                    evidence.append(EvidenceItem(
+                        category="ML_SCAM_LANGUAGE",
+                        severity=Severity.low,
+                        title="Scam language model indicates moderate risk",
+                        detail=f"Scam language classification probability: {prob:.1%}.",
+                        source=EvidenceSource.model,
+                    ))
+                checks.append(CheckPerformed(
+                    name="Scam language model",
+                    status=CheckStatus.completed,
+                    detail=f"Probability {prob:.1%} ({ml_pred.get('band', 'unknown')}).",
+                ))
+            else:
+                checks.append(CheckPerformed(
+                    name="Scam language model",
+                    status=CheckStatus.unavailable,
+                    detail="Model unavailable or not trained.",
+                ))
+        except Exception as e:
+            logger.debug(f"SMS ML prediction failed: {e}")
+            checks.append(CheckPerformed(
+                name="Scam language model",
+                status=CheckStatus.unavailable,
+                detail=str(e),
+            ))
+
+        verdict = _decide_sms_verdict(evidence, message, sender_result)
         display_label = make_display_label("sms", verdict)
 
         # Summary formation
@@ -530,6 +633,7 @@ class SmsAnalysisService:
             limitations=limitations,
             recommendations=recommendations,
             analysis_version="1.0.0",
+            model_version=model_version,
             input_summary=f"SMS ({len(message)} chars)" + (f" from {sender}" if sender else ""),
         )
 
@@ -555,5 +659,5 @@ def _build_sms_summary(verdict: Verdict, evidence: list[EvidenceItem], sender_re
         reason = med_ev[0].title if med_ev else "suspicious characteristics"
         return f"This message shows suspicious characteristics ({reason}). Verify with the sender via official channels before taking action."
     if verdict == Verdict.clean_no_findings:
-        return "No strong warning signs were found in this message. Always verify unexpected notifications directly with your provider."
-    return "The message could not be verified due to insufficient or ambiguous content."
+        return "No strong warning signs were found in this message, but this is not proof of safety. Always verify unexpected notifications directly with your provider."
+    return "Not enough evidence to verify this message. Exercise caution and verify directly with the sender or provider."

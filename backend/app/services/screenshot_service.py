@@ -160,13 +160,27 @@ def _extract_fields(text: str) -> dict:
     """Extract payment fields from OCR text."""
     fields = {}
 
-    # Amount
-    amount_match = re.search(
-        r"(?:\u20b9|Rs\.?|INR)\s*([\d,]+(?:\.\d{1,2})?)",
-        text, re.IGNORECASE
-    )
-    if amount_match:
-        fields["amount"] = {"raw": amount_match.group(0), "value": amount_match.group(1), "status": "read"}
+    # Amount extraction by tiers:
+    # 1. Currency marker (₹, Rs, INR, Rupees) -> "read"
+    # 2. Label (amount/paid/sent/received/total) followed by number -> "read"
+    # 3. Misread rupee sign (% T Z ?) -> "low_confidence" (never counts as read)
+    amount_found = None
+    m1 = re.search(r"(?:₹|\u20b9|Rs\.?|INR|Rupees)\s*(\d[\d,]*(?:\.\d{1,2})?)", text, re.IGNORECASE)
+    if m1:
+        amount_found = {"raw": m1.group(0), "value": m1.group(1), "status": "read"}
+
+    if not amount_found:
+        m2 = re.search(r"\b(?:amount|paid|sent|received|total)[:\s]+(?:(?:₹|\u20b9|Rs\.?|INR|Rupees)\s*)?(\d[\d,]*(?:\.\d{1,2})?)", text, re.IGNORECASE)
+        if m2:
+            amount_found = {"raw": m2.group(0), "value": m2.group(1), "status": "read"}
+
+    if not amount_found:
+        m3 = re.search(r"[%TZ\?]\s*(\d[\d,]*(?:\.\d{1,2})?)", text)
+        if m3:
+            amount_found = {"raw": m3.group(0), "value": m3.group(1), "status": "low_confidence"}
+
+    if amount_found:
+        fields["amount"] = amount_found
     else:
         fields["amount"] = {"raw": None, "value": None, "status": "not_found"}
 
@@ -241,6 +255,23 @@ def _check_screenshot_rules(fields: dict, text: str, ocr_confidence: float) -> l
                 source=EvidenceSource.ocr,
             ))
 
+    # Rule: labelled UTR / "UPI Ref" number that is digits-only and not exactly 12 digits -> medium finding "UTR_FORMAT"
+    utr_candidates = re.findall(
+        r"(?:UTR|UPI\s*Ref(?:erence)?(?:\s*No\.?)?|Ref\s*No\.?)[:\s#]*([A-Za-z0-9]+)",
+        text,
+        re.IGNORECASE,
+    )
+    for ref_num in utr_candidates:
+        if ref_num.isdigit() and len(ref_num) != 12:
+            evidence.append(EvidenceItem(
+                category="UTR_FORMAT",
+                severity=Severity.medium,
+                title="Invalid UTR / UPI Reference format",
+                detail=f"Labelled reference number '{ref_num}' contains {len(ref_num)} digits instead of the mandatory 12 digits.",
+                source=EvidenceSource.ocr,
+            ))
+            break
+
     # Success without reference ID
     status_val = (fields.get("status") or {}).get("value", "")
     utr_status = (fields.get("utr") or {}).get("status", "not_found")
@@ -288,14 +319,6 @@ def _decide_screenshot_verdict(
     if not ocr_available:
         return Verdict.inconclusive
 
-    # Check if key fields were read
-    key_read = sum(
-        1 for k in ("amount", "status") if (fields.get(k) or {}).get("status") == "read"
-    )
-
-    if ocr_confidence < 0.3 and ocr_confidence > 0 and key_read == 0:
-        return Verdict.inconclusive  # Important details could not be read
-
     high = sum(1 for e in evidence if e.severity == Severity.high)
     medium = sum(1 for e in evidence if e.severity == Severity.medium)
 
@@ -305,8 +328,11 @@ def _decide_screenshot_verdict(
     if medium >= 1:
         return Verdict.suspicious
 
-    if key_read == 0:
-        # Return a special variant of inconclusive for "important details not read"
+    amount_read = (fields.get("amount") or {}).get("status") == "read"
+    status_read = (fields.get("status") or {}).get("status") == "read"
+
+    # Never return clean_no_findings unless BOTH amount and status have status "read"
+    if not (amount_read and status_read):
         return Verdict.inconclusive
 
     return Verdict.clean_no_findings
@@ -429,13 +455,9 @@ class ScreenshotAnalysisService:
 
         verdict = _decide_screenshot_verdict(evidence, fields, ocr_confidence, ocr_available)
 
-        # Special label for "important details not read"
+        # Label for inconclusive: "Could not verify this screenshot"
         if verdict == Verdict.inconclusive:
-            key_read = sum(1 for k in ("amount", "status") if (fields.get(k) or {}).get("status") == "read")
-            if key_read == 0 and ocr_confidence > 0:
-                display_label = "Important details could not be read"
-            else:
-                display_label = make_display_label("screenshot", verdict)
+            display_label = "Could not verify this screenshot"
         else:
             display_label = make_display_label("screenshot", verdict)
 
@@ -473,11 +495,24 @@ def _build_screenshot_summary(verdict: Verdict, fields: dict, evidence: list) ->
         reason = high_ev[0].title if high_ev else "inconsistent data"
         return f"Suspicious or inconsistent evidence detected: {reason}. Do not accept this as proof of payment."
     if verdict == Verdict.suspicious:
-        return "Some inconsistencies were found in this screenshot. Verify payment through official channels."
+        med_ev = [e for e in evidence if e.severity in (Severity.high, Severity.medium)]
+        reason = med_ev[0].title if med_ev else "inconsistent details"
+        return f"Some inconsistencies were found in this screenshot ({reason}). Verify payment through official channels."
     if verdict == Verdict.inconclusive:
-        return ("Important payment details could not be clearly read from this image. "
-                "The image may be blurry, cropped, or not a payment screenshot.")
-    amount = (fields.get("amount") or {}).get("raw", "unknown amount")
-    status = (fields.get("status") or {}).get("value", "unknown status")
-    return (f"No obvious inconsistencies detected ({status}, {amount}). "
+        amount_read = (fields.get("amount") or {}).get("status") == "read"
+        status_read = (fields.get("status") or {}).get("status") == "read"
+        if not amount_read and not status_read:
+            return "Could not verify this screenshot because both the amount and the payment status could not be read."
+        if not amount_read:
+            return "Could not verify this screenshot because the amount could not be read."
+        if not status_read:
+            return "Could not verify this screenshot because the payment status could not be read."
+        return "Could not verify this screenshot because key payment details could not be read."
+
+    raw_amount = (fields.get("amount") or {}).get("raw") or (fields.get("amount") or {}).get("value")
+    raw_status = (fields.get("status") or {}).get("value") or (fields.get("status") or {}).get("raw")
+    amount_str = "amount verified" if (raw_amount is None or str(raw_amount).lower() == "none") else str(raw_amount)
+    status_str = "status verified" if (raw_status is None or str(raw_status).lower() == "none") else str(raw_status)
+
+    return (f"No obvious inconsistencies detected ({status_str}, {amount_str}). "
             "Always verify receipt in your own bank or UPI app — a screenshot alone is not proof.")

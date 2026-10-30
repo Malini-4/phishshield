@@ -7,6 +7,7 @@ import {
   ExternalLink,
   ShieldCheck,
   Info,
+  FolderOpen,
 } from 'lucide-react';
 import { AnalysisResult } from '../types';
 import { StatusBadge } from './StatusBadge';
@@ -61,6 +62,53 @@ export const ResultSummary: React.FC<ResultSummaryProps> = ({ result }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      {/* Connected Case Banner */}
+      {result.case_id && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0.85rem 1.25rem',
+            background: 'rgba(8, 127, 245, 0.12)',
+            border: '1px solid rgba(22, 200, 255, 0.35)',
+            borderRadius: 'var(--radius-md)',
+            color: '#EAF5FF',
+            flexWrap: 'wrap',
+            gap: '0.75rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <FolderOpen size={20} color="#16C8FF" />
+            <div>
+              <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#FFFFFF' }}>
+                This is part of an active Case dossier
+              </span>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0 }}>
+                Automatically grouped with other investigations sharing common threat indicators.
+              </p>
+            </div>
+          </div>
+          <Link
+            to={`/cases/${result.case_id}`}
+            className="btn-secondary"
+            style={{
+              fontSize: '0.82rem',
+              padding: '0.45rem 0.95rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              textDecoration: 'none',
+              fontWeight: 600,
+              border: '1px solid rgba(22, 200, 255, 0.4)',
+            }}
+          >
+            <span>View Case</span>
+            <ExternalLink size={14} />
+          </Link>
+        </div>
+      )}
+
       {/* 1. Main Verdict & Short Explanation Card */}
       <div className={`card result-header-card ${getVerdictClass(result.verdict)}`}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1.25rem' }}>
